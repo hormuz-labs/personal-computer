@@ -18,7 +18,7 @@ By using this setup, you can connect to the remote VM via SSH or **VS Code Remot
 
 ## Features
 
-*   **Automated Provisioning:** Creates a GCP Ubuntu 22.04 LTS VM with a fast SSD.
+*   **Automated Provisioning:** Creates a GCP Ubuntu 22.04 LTS VM with a fast SSD. By default, it provisions an `e2-standard-2` machine which has **2 vCPUs and 8GB RAM** (the recommended baseline for VS Code Remote server).
 *   **Secure SSH Access:** Automatically injects your local SSH key for passwordless entry via firewall rules.
 *   **Developer Tooling Ready-to-Go:**
     *   **Zsh & Oh My Zsh:** Set as default shell with pre-configured plugins (`git`, `docker`, `docker-compose`, `node`, `npm`, `nvm`, `bun`).
@@ -46,6 +46,11 @@ Navigate to the `terraform/` directory:
 cd terraform
 ```
 
+If you don't have an SSH key pair specifically for this VM, generate one (recommended):
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/hormuz_dev_vm -N "" -C "hormuz_dev_vm"
+```
+
 Copy the example variables file:
 
 ```bash
@@ -55,8 +60,8 @@ cp terraform.tfvars.example terraform.tfvars
 Edit `terraform.tfvars` and fill in your details:
 *   `project_id`: Your Google Cloud Project ID.
 *   `ssh_user`: Your local username (this is what you will use to log in).
-*   `ssh_pub_key_path`: The path to your local public SSH key.
-*   `repo_to_clone`: (Optional) The Git repository URL you want to immediately start working on (e.g., `git@github.com:username/repo.git`).
+*   `ssh_pub_key_path`: The path to your local public SSH key (e.g., `"~/.ssh/hormuz_dev_vm.pub"`).
+*   `repo_to_clone`: (Optional) The Git repository URL you want to immediately start working on (e.g., `"git@github.com:hormuz-labs/pitch.git"`).
 
 ### 2. Deploy the VM
 
@@ -82,9 +87,14 @@ Type `yes` when prompted.
 
 ### 3. Connect
 
-Once Terraform finishes, it will output the public IP address of your new VM. 
+Once Terraform finishes, it will output the public IP address of your new VM. Give the VM about 60-90 seconds to finish running the startup script (which installs Docker, Zsh, Node, Bun, OpenCode, and clones your repo).
 
 **Using SSH:**
+If you used a custom SSH key path (like `~/.ssh/hormuz_dev_vm`), you need to specify it with the `-i` flag:
+```bash
+ssh -i ~/.ssh/hormuz_dev_vm <your_ssh_user>@<vm_public_ip>
+```
+If you used your default `id_rsa` or `id_ed25519`, simply run:
 ```bash
 ssh <your_ssh_user>@<vm_public_ip>
 ```
@@ -92,7 +102,8 @@ ssh <your_ssh_user>@<vm_public_ip>
 **Using VS Code:**
 1. Install the **Remote - SSH** extension in VS Code.
 2. Click the remote indicator in the bottom-left corner and select **Connect to Host...**.
-3. Enter `ssh <your_ssh_user>@<vm_public_ip>`.
+3. If using a default key, enter `ssh <your_ssh_user>@<vm_public_ip>`. 
+    * *Note: If using a custom key like `hormuz_dev_vm`, you should first configure your `~/.ssh/config` file locally to associate the VM's IP address with that specific IdentityFile, then connect.*
 4. Open the `/home/<your_ssh_user>/workspace` folder and start coding!
 
 ### 4. Setting up GitHub (One-Time)
