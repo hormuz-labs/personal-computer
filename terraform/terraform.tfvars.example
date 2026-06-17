@@ -1,0 +1,20 @@
+# Rename this file to terraform.tfvars and fill in your values
+
+# Your GCP Project ID
+project_id = "your-gcp-project-id"
+
+# Your local computer username (this will be used to log into the VM)
+ssh_user = "shanurrahman"
+
+# Path to your local public SSH key
+ssh_pub_key_path = "~/.ssh/id_rsa.pub"
+
+# (Optional) Change the region and zone if needed
+# region = "us-central1"
+# zone   = "us-central1-a"
+
+# (Optional) Adjust machine type based on your needs
+# machine_type = "e2-standard-2"
+
+# (Optional) Repository to automatically clone into ~/workspace on startup
+# repo_to_clone = "git@github.com:yourusername/your-repo.git"
